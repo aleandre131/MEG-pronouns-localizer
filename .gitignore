@@ -1,5 +1,5 @@
-Localizer.exe
-localizer
 data/
 go.work
 go.work.sum
+/Localizer.exe
+/localizer

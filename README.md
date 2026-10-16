@@ -5,9 +5,12 @@ installation MEG (port parallèle, boutons rouges, photodiode), même format de 
 
 ## Récupérer le programme
 
-Les exécutables déjà compilés (`Localizer.exe` pour Windows, `localizer` pour la
-machine MEG Linux) sont dans la page **Releases** du dépôt. Les mettre à la racine
-du dossier cloné (les photos sont déjà intégrées dans l'exécutable).
+Les exécutables déjà compilés sont dans `bin/` (les photos sont intégrées dedans,
+ils fonctionnent seuls, sans le reste du dossier) :
+- `bin/Localizer.exe` : Windows, pour tester ;
+- `bin/localizer` : Linux, machine MEG (`chmod +x localizer` si besoin).
+
+Les copier où l'on veut ; les données sont écrites dans `data/` à côté de l'exécutable.
 
 ## Lancer
 
