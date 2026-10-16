@@ -1,0 +1,33 @@
+index,category,item,word,gender
+1,person,banquier,banquier,m
+2,person,policier,policier,m
+3,person,plombier,plombier,m
+4,person,chasseur,chasseur,m
+5,person,jardinier,jardinier,m
+6,person,chauffeur,chauffeur,m
+7,person,mécanicien,mécanicien,m
+8,person,conducteur,conducteur,m
+9,person,fermière,fermière,f
+10,person,danseuse,danseuse,f
+11,person,vendeuse,vendeuse,f
+12,person,serveuse,serveuse,f
+13,person,chanteuse,chanteuse,f
+14,person,caissière,caissière,f
+15,person,directrice,directrice,f
+16,person,boulangère,boulangère,f
+17,place,le stade,stade,m
+18,place,le parc,parc,m
+19,place,le bureau,bureau,m
+20,place,le jardin,jardin,m
+21,place,le marché,marché,m
+22,place,le cinéma,cinéma,m
+23,place,le métro,métro,m
+24,place,le parking,parking,m
+25,place,la cave,cave,f
+26,place,la mer,mer,f
+27,place,la cuisine,cuisine,f
+28,place,la forêt,forêt,f
+29,place,la montagne,montagne,f
+30,place,la gare,gare,f
+31,place,la piscine,piscine,f
+32,place,la classe,classe,f

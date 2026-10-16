@@ -1,0 +1,10 @@
+Photos brutes du localizer - catalogue du Google Sheet "MEG Pronouns stimuli" (onglet words)
+(= meme liste que stimuli.csv de MEG-pronouns-main ; les noms du PowerPoint ne sont pas encore valides)
+
+Deposer 3 a 4 photos par dossier (jpg, png, webp, avif - n'importe quelle taille).
+Ne pas renommer les dossiers.
+
+persons/ : 16 metiers (8 m, 8 f)
+places/  : 16 lieux - 15 deja remplis, "la cave" vide
+
+L'ancien design (celebrites, code, sauvegardes) est dans ../../_archives/
