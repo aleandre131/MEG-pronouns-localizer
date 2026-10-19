@@ -1,7 +1,7 @@
 # Localizer — personnes vs lieux, image vs mot (MEG)
 
 Construit sur le modèle de `MEG-pronouns-main` : même version de goxpyriment, même
-installation MEG (port parallèle, boutons rouges, photodiode), même format de données.
+installation MEG (port parallèle, boutons bleus, photodiode), même format de données.
 
 ## Récupérer le programme
 
@@ -25,7 +25,7 @@ Les copier où l'on veut ; les données sont écrites dans `data/` à côté de 
 | Option | Rôle |
 |---|---|
 | `-s N` | sujet (l'ordre des essais dépend du sujet, et il est reproductible) |
-| `-meg` | triggers sur `/dev/parport1` ; réponses avec les boutons rouges (l'un ou l'autre) |
+| `-meg` | triggers sur `/dev/parport1` ; réponses avec les boutons bleus (l'un ou l'autre : gauche `/dev/parport2`, droit `/dev/parport0`, masque 0x40) |
 | `-run N` | commencer au run N (1 ou 2) |
 | `-practice=false` | sans les 16 essais d'entraînement (faits avant le run 1, sans triggers) |
 | `-photodiode on/off/auto` | carré blanc en haut à gauche à chaque onset (`auto` = actif avec `-meg`) |
@@ -137,5 +137,5 @@ Sous Linux/macOS : `go build -o localizer .` (même remarque pour `GONOSUMDB`/`G
 - Lancer `./localizer -s 1 -meg -auto -n 40` et vérifier :
   - que les codes arrivent bien sur STI101 ;
   - le délai entre le trigger et la photodiode ;
-  - que les deux boutons rouges apparaissent bien sur leurs canaux.
-- Les broches des boutons (12 et 13) sont reprises de `MEG-pronouns-main`, qui les a lui-même déduites de Pushmi. Elles sont à confirmer sur l'installation.
+  - que les deux boutons bleus apparaissent bien sur leurs canaux (STI007 et STI012).
+- Boutons : les bleus (gauche = port 2, droit = port 0, valeur expyriment 0b1000 = bit status 0x40) viennent du tableau de la salle MEG (19/10/2026). `python3 tools/test_boutons_parport.py` affiche les lignes des ports en direct pour vérifier.
