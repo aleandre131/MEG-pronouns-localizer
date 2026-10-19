@@ -53,22 +53,26 @@ ESPACE démarre chaque run (l'opérateur). ESC arrête tout ; ce qui a été pr�
    - Aucun cadre rouge pendant les 10 premiers essais, et au moins 8 essais entre deux cadres rouges.
    - Le participant appuie dès qu'il voit un cadre rouge. Un appui dans la seconde qui suit compte comme une détection ; tout autre appui est une fausse alarme.
 
-## Triggers (STI101, ou STI001–STI008)
+## Triggers (STI101 avec masque 0xBF, ou STI001–STI008)
+
+**Aucun code n'utilise le bit de valeur 64 (ligne STI007)** : sur l'installation MEG de
+NeuroSpin, le bouton bleu gauche arrive aussi sur STI007 (vérifié le 19/10/2026). Un code
+contenant ce bit serait indiscernable d'un appui.
 
 | Code | Événement |
 |---|---|
 | 1–32 | photo, cadre blanc (code = n° de l'item) |
-| 33–64 | mot, cadre blanc (32 + n° de l'item) |
-| 65–96 | photo, cadre rouge (64 + n° de l'item) |
-| 97–128 | mot, cadre rouge (96 + n° de l'item) |
-| 201, 202 | écran de consignes ou de pause avant le run 1 ou 2 |
-| 255 | écran de fin |
+| 129–160 | mot, cadre blanc (128 + n° de l'item) |
+| 33 / 34 | cadre rouge, photo : personne / lieu |
+| 35 / 36 | cadre rouge, mot : personne / lieu |
+| 61, 62 | écran de consignes ou de pause avant le run 1 ou 2 |
+| 63 | écran de fin |
 
 Les numéros d'items sont dans `items.csv` : 1–16 pour les personnes (8 hommes puis 8 femmes), 17–32 pour les lieux.
+Pour les cadres rouges, l'item exact est dans le fichier de données (colonne `item`).
 
-Pour retrouver les catégories à partir du code :
-- code ≤ 16 ou 33–48 : personne en blanc ;
-- 17–32 ou 49–64 : lieu en blanc.
+Boutons : bleu gauche sur STI007, bleu droit sur STI012 (lignes propres à la MEG).
+Avec MNE : `mne.find_events(raw, "STI101", mask=0xBF, mask_type="and")` pour les codes des stimuli.
 
 Chaque code part juste après le flip qui affiche l'item, en même temps que le carré de la photodiode. Les boutons sont enregistrés par la MEG sur leurs propres lignes STI. L'entraînement n'envoie aucun trigger.
 

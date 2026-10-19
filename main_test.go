@@ -134,25 +134,33 @@ func TestSameSubjectSameOrder(t *testing.T) {
 func TestTriggerCodes(t *testing.T) {
 	items := testItems(t)
 	seen := map[byte]string{}
+	all := []byte{codeRunStart + 1, codeRunStart + 2, codeEnd}
 	for _, it := range items {
 		for _, f := range []string{"image", "word"} {
-			for _, tg := range []bool{false, true} {
-				tr := &Trial{Format: f, Item: it, Target: tg}
-				c := tr.Code()
-				if c == 0 || c >= codeRunStart {
-					t.Fatalf("code %d out of range", c)
-				}
-				if prev, ok := seen[c]; ok {
-					t.Fatalf("code %d used twice (%s)", c, prev)
-				}
-				seen[c] = it.Name + f
+			tr := &Trial{Format: f, Item: it}
+			c := tr.Code()
+			if prev, ok := seen[c]; ok {
+				t.Fatalf("code %d used twice (%s)", c, prev)
 			}
+			seen[c] = it.Name + f
+			all = append(all, c)
+			all = append(all, (&Trial{Format: f, Item: it, Target: true}).Code())
+		}
+	}
+	for _, c := range all {
+		if c == 0 || c&forbiddenBits != 0 {
+			t.Fatalf("code %d is 0 or uses the bit 64 (STI007, left blue button)", c)
+		}
+	}
+	for _, c := range []byte{codeRunStart + 1, codeRunStart + 2, codeEnd, 33, 34, 35, 36} {
+		if _, ok := seen[c]; ok {
+			t.Fatalf("code %d used by a stimulus and by an event", c)
 		}
 	}
 	if (&Trial{Format: "image", Item: items[0]}).Code() != 1 ||
-		(&Trial{Format: "word", Item: items[31]}).Code() != 64 ||
-		(&Trial{Format: "image", Item: items[16], Target: true}).Code() != 81 ||
-		(&Trial{Format: "word", Item: items[31], Target: true}).Code() != 128 {
+		(&Trial{Format: "word", Item: items[31]}).Code() != 160 ||
+		(&Trial{Format: "image", Item: items[16], Target: true}).Code() != 34 ||
+		(&Trial{Format: "word", Item: items[0], Target: true}).Code() != 35 {
 		t.Fatal("code table changed")
 	}
 }

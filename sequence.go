@@ -27,22 +27,27 @@ const (
 	maxSameCat     = 4  // at most this many persons (or places) in a row
 )
 
-// Trigger codes (value read on STI101, or STI001-STI008):
+// Trigger codes (value read on STI101 with mask 0xBF, or STI001-STI008).
 //
-//	1-32    image onset, white frame   (code = item index)
-//	33-64   word onset, white frame    (code = 32 + item index)
-//	65-96   image onset, RED frame     (code = 64 + item index)
-//	97-128  word onset, RED frame      (code = 96 + item index)
-//	200+run instruction / pause screen before the run (201, 202)
-//	255     end screen
+// No code uses the bit of value 64 (line STI007): on the NeuroSpin rig the
+// left BLUE response button is recorded on STI007 too (checked 19/10/2026),
+// so a code with that bit could not be told apart from a press.
+//
+//	1-32     image onset, white frame   (code = item index)
+//	129-160  word onset, white frame    (code = 128 + item index)
+//	33-36    RED frame onset: 33 image-person, 34 image-place,
+//	         35 word-person, 36 word-place (the item is in the data file)
+//	61, 62   instruction / pause screen before run 1, run 2
+//	63       end screen
 //
 // Item index: 1-16 persons, 17-32 places (items.csv). The response buttons are
-// recorded by the MEG on their own STI lines.
+// recorded by the MEG on their own STI lines (blue left STI007, blue right STI012).
 const (
-	codeWordOffset   = 32
-	codeTargetOffset = 64
-	codeRunStart     = 200
-	codeEnd          = 255
+	codeWordOffset = 128
+	codeTargetBase = 33
+	codeRunStart   = 60 // + run
+	codeEnd        = 63
+	forbiddenBits  = 0x40 // STI007, shared with the left blue button
 )
 
 // Item is one row of items.csv.
@@ -73,12 +78,19 @@ type Trial struct {
 
 // Code is the trigger written at the trial's onset.
 func (t *Trial) Code() byte {
+	if t.Target {
+		c := codeTargetBase
+		if t.Format == "word" {
+			c += 2
+		}
+		if t.Item.Category == "place" {
+			c++
+		}
+		return byte(c)
+	}
 	c := t.Item.Index
 	if t.Format == "word" {
 		c += codeWordOffset
-	}
-	if t.Target {
-		c += codeTargetOffset
 	}
 	return byte(c)
 }
