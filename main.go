@@ -4,7 +4,7 @@
 // shown one at a time in the centre of the screen, in a square frame: 500 ms
 // on, then 500 ms of the fixation dot. Image and word trials strictly
 // alternate. On 20 trials per run the frame is red instead of white; the
-// participant presses a blue button as soon as they see it (vigilance task,
+// participant presses a green button as soon as they see it (vigilance task,
 // unrelated to person/place). 2 runs of 384 trials (6.5 min each), in one
 // session with a pause between them; each item appears 6 times as an image and
 // 6 times as a word per run. The photos are the normalised ones
@@ -16,9 +16,9 @@
 // buttons are recorded by the MEG on their own STI lines.
 //
 // Hardware, as in MEG-pronouns-main (Pushmi, NeuroSpin): triggers on the data
-// lines of /dev/parport1; BLUE buttons on status lines (rig table 19/10/2026,
-// expyriment read_status 0b1000 = status bit 6, 0x40): left on /dev/parport2,
-// right on /dev/parport0. Either button counts.
+// lines of /dev/parport1 (STI001-STI008); GREEN buttons on status lines (rig
+// table 19/10/2026): left = port 0 0b0001 (status bit 3, 0x08, STI009), right =
+// port 1 0b0100 (status bit 5, 0x20, STI014). Either button counts.
 //
 // Usage:
 //
@@ -73,10 +73,10 @@ const (
 	dataDir       = "data"
 	pollInterval  = 500 * time.Microsecond
 	triggerPort   = "/dev/parport1"
-	leftBtnPort   = "/dev/parport2" // blue left
-	rightBtnPort  = "/dev/parport0" // blue right
-	leftBtnMask   = 0x40            // status bit 6 = expyriment read_status 0b1000
-	rightBtnMask  = 0x40
+	leftBtnPort   = "/dev/parport0" // green left (STI009)
+	rightBtnPort  = "/dev/parport1" // green right (STI014)
+	leftBtnMask   = 0x08            // status bit 3 = expyriment read_status 0b0001
+	rightBtnMask  = 0x20            // status bit 5 = expyriment read_status 0b0100
 	frameSize     = 360 // outer side of the frame, px (photos are 320 x 320)
 	frameWidth    = 4
 	defaultFontPt = 48 // as the words of the main experiment
@@ -100,7 +100,7 @@ type press struct {
 	source string // "left", "right", "key"
 }
 
-// buttonReader polls the blue buttons in the background while a run is
+// buttonReader polls the green buttons in the background while a run is
 // presented, and records each press (transition to "down").
 type buttonReader struct {
 	left, right  *triggers.ParallelPort
@@ -180,7 +180,7 @@ func (b *buttonReader) finish() []press {
 func instructionText(meg bool) string {
 	how := "appuyez sur ESPACE"
 	if meg {
-		how = "appuyez sur un bouton bleu (gauche ou droit)"
+		how = "appuyez sur un bouton vert (gauche ou droit)"
 	}
 	return "Bienvenue !\n\n" +
 		"Des photos et des mots vont apparaître l'un après l'autre au centre de l'écran, " +
@@ -205,7 +205,7 @@ const endText = "C'est terminé.\n\nMerci pour votre participation !"
 // ---------------------------------------------------------------------------
 
 func main() {
-	meg := flag.Bool("meg", false, "MEG mode: triggers on "+triggerPort+", answers with the blue buttons (otherwise: keyboard, no triggers)")
+	meg := flag.Bool("meg", false, "MEG mode: triggers on "+triggerPort+", answers with the green buttons (otherwise: keyboard, no triggers)")
 	photodiode := flag.String("photodiode", "auto", "photodiode square in the top-left corner: on, off, or auto (on with -meg)")
 	photodiodeSize := flag.Float64("photodiode-size", control.DefaultPhotodiodeSize, "side of the photodiode square, in pixels")
 	ttlMs := flag.Float64("ttl-ms", 0, "how long each trigger code stays on the lines, in ms (0 = 3 frames)")
@@ -312,7 +312,7 @@ func main() {
 	}
 	respDesc := "keyboard (SPACE or arrows)"
 	if buttons != nil {
-		respDesc = fmt.Sprintf("MEG blue buttons, either: left %s mask 0x%02x, right %s mask 0x%02x (baselines 0x%02x, 0x%02x)",
+		respDesc = fmt.Sprintf("MEG green buttons, either: left %s mask 0x%02x, right %s mask 0x%02x (baselines 0x%02x, 0x%02x)",
 			leftBtnPort, leftBtnMask, rightBtnPort, rightBtnMask, buttons.baseL, buttons.baseR)
 	}
 	exp.AddExperimentInfo("responses: " + respDesc)

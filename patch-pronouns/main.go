@@ -2,7 +2,7 @@
 //
 // Each trial: fixation (1000 ms), sentence 1 word by word (6 words, each
 // 200 ms on + 300 ms fixation), a 1000 ms break, sentence 2 (3 words, same
-// timing), then a felicity judgment (two blue buttons, max 3000 ms) answered
+// timing), then a felicity judgment (two green buttons, max 3000 ms) answered
 // once the last word has gone off, and 500 ms of feedback on the fixation
 // dot (green correct, red incorrect, dark grey timeout). 160 trials per subject
 // in 5 blocks of 32, with a pause before each block that the operator ends with SPACE. Trials come
@@ -96,21 +96,23 @@ const (
 // ---------------------------------------------------------------------------
 // MEG hardware (NeuroSpin, as in the Pushmi experiment)
 //
-// Triggers go out on the data lines of /dev/parport1. The response pad's BLUE
-// buttons come in on status lines (rig table, 19/10/2026, the red ones being
-// unreliable): left blue = port 2 value 0b1000, right blue = port 0 value
-// 0b1000, in expyriment's read_status convention (status register >> 3), i.e.
-// status bit 6 (0x40, pin 10 nAck) of /dev/parport2 and of /dev/parport0.
-// Same table for the red buttons: port 0 0b0100 and port 1 0b0010, i.e. the
-// previous setting 0x20 on /dev/parport0 and 0x10 on /dev/parport1.
+// Triggers go out on the data lines of /dev/parport1 (STI001-STI008). The
+// response pad's GREEN buttons come in on status lines (rig table, 19/10/2026):
+// left green = port 0 value 0b0001, right green = port 1 value 0b0100, in
+// expyriment's read_status convention (status register >> 3), i.e. status
+// bit 3 (0x08) of /dev/parport0 and status bit 5 (0x20) of /dev/parport1.
+// On the MEG they are STI009 and STI014, clear of the trigger lines (the blue
+// left button shared STI007 with trigger bit 64; the red ones are unreliable).
+// Same table: blue = port 2 0b1000 / port 0 0b1000; red = port 0 0b0100 /
+// port 1 0b0010.
 // A button is down when its bit differs from the value read at startup.
 
 const (
 	triggerPort     = "/dev/parport1"
-	leftButtonPort  = "/dev/parport2"
-	rightButtonPort = "/dev/parport0"
-	leftButtonMask  = 0x40 // status bit 6 = expyriment read_status 0b1000
-	rightButtonMask = 0x40 // status bit 6 = expyriment read_status 0b1000
+	leftButtonPort  = "/dev/parport0" // green left (STI009)
+	rightButtonPort = "/dev/parport1" // green right (STI014)
+	leftButtonMask  = 0x08            // status bit 3 = expyriment read_status 0b0001
+	rightButtonMask = 0x20            // status bit 5 = expyriment read_status 0b0100
 	pollInterval    = 500 * time.Microsecond
 )
 
@@ -379,7 +381,7 @@ func (b *buttonResponder) poll() (string, uint64, error) {
 }
 
 func (b *buttonResponder) desc() string {
-	return fmt.Sprintf("MEG blue buttons: left %s mask 0x%02x, right %s mask 0x%02x (baselines 0x%02x, 0x%02x)",
+	return fmt.Sprintf("MEG green buttons: left %s mask 0x%02x, right %s mask 0x%02x (baselines 0x%02x, 0x%02x)",
 		leftButtonPort, leftButtonMask, rightButtonPort, rightButtonMask, b.baseL, b.baseR)
 }
 
@@ -419,8 +421,8 @@ func waitResponse(r responder, deadlineNS uint64) (string, uint64, error) {
 func mappingText(congruentKey string) string {
 	other := map[string]string{"left": "DROIT", "right": "GAUCHE"}[congruentKey]
 	this := map[string]string{"left": "GAUCHE", "right": "DROIT"}[congruentKey]
-	return "bouton bleu " + this + " : oui, la suite est naturelle\n" +
-		"bouton bleu " + other + " : non, la suite est étrange"
+	return "bouton vert " + this + " : oui, la suite est naturelle\n" +
+		"bouton vert " + other + " : non, la suite est étrange"
 }
 
 func instructionText(congruentKey string) string {
@@ -445,7 +447,7 @@ const endText = "L'expérience est terminée.\n\nMerci pour votre participation 
 // ---------------------------------------------------------------------------
 
 func main() {
-	meg := flag.Bool("meg", false, "MEG mode: triggers on "+triggerPort+", answers with the blue buttons of the response pad (otherwise: keyboard arrows, no triggers)")
+	meg := flag.Bool("meg", false, "MEG mode: triggers on "+triggerPort+", answers with the green buttons of the response pad (otherwise: keyboard arrows, no triggers)")
 	photodiode := flag.String("photodiode", "auto", "photodiode square in the top-left corner: on, off, or auto (on with -meg)")
 	photodiodeSize := flag.Float64("photodiode-size", control.DefaultPhotodiodeSize, "side of the photodiode square, in pixels")
 	ttlMs := flag.Float64("ttl-ms", 0, "how long each trigger code stays on the lines, in ms (0 = 3 frames, 25 ms at 120 Hz)")

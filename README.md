@@ -1,7 +1,7 @@
 # Localizer — personnes vs lieux, image vs mot (MEG)
 
 Construit sur le modèle de `MEG-pronouns-main` : même version de goxpyriment, même
-installation MEG (port parallèle, boutons bleus, photodiode), même format de données.
+installation MEG (port parallèle, boutons verts, photodiode), même format de données.
 
 ## Récupérer le programme
 
@@ -25,7 +25,7 @@ Les copier où l'on veut ; les données sont écrites dans `data/` à côté de 
 | Option | Rôle |
 |---|---|
 | `-s N` | sujet (l'ordre des essais dépend du sujet, et il est reproductible) |
-| `-meg` | triggers sur `/dev/parport1` ; réponses avec les boutons bleus (l'un ou l'autre : gauche `/dev/parport2`, droit `/dev/parport0`, masque 0x40) |
+| `-meg` | triggers sur `/dev/parport1` ; réponses avec les boutons verts (l'un ou l'autre : gauche `/dev/parport0` masque 0x08, droit `/dev/parport1` masque 0x20) |
 | `-run N` | commencer au run N (1 ou 2) |
 | `-practice=false` | sans les 16 essais d'entraînement (faits avant le run 1, sans triggers) |
 | `-photodiode on/off/auto` | carré blanc en haut à gauche à chaque onset (`auto` = actif avec `-meg`) |
@@ -137,5 +137,5 @@ Sous Linux/macOS : `go build -o localizer .` (même remarque pour `GONOSUMDB`/`G
 - Lancer `./localizer -s 1 -meg -auto -n 40` et vérifier :
   - que les codes arrivent bien sur STI101 ;
   - le délai entre le trigger et la photodiode ;
-  - que les deux boutons bleus apparaissent bien sur leurs canaux (STI007 et STI012).
-- Boutons : les bleus (gauche = port 2, droit = port 0, valeur expyriment 0b1000 = bit status 0x40) viennent du tableau de la salle MEG (19/10/2026). `python3 tools/test_boutons_parport.py` affiche les lignes des ports en direct pour vérifier.
+  - que les deux boutons verts apparaissent bien sur leurs canaux (STI009 et STI014).
+- Boutons : les verts (gauche = port 0 valeur expyriment 0b0001 = bit status 0x08, STI009 ; droit = port 1 0b0100 = 0x20, STI014) viennent du tableau de la salle MEG (19/10/2026). Ils sont hors des lignes des triggers (STI001–STI008). Le bleu gauche partageait STI007 avec le bit 64 des triggers. `python3 tools/test_boutons_parport.py` affiche les lignes des ports en direct pour vérifier.
